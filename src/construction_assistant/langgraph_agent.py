@@ -5,9 +5,6 @@ comparing them, and formatting output.
 
 Uses the real `langgraph` library from LangChain.
 """
-from typing import Dict, Any
-from typing_extensions import TypedDict
-
 try:
     from langgraph.graph import StateGraph, START, END
 except ImportError:
@@ -16,16 +13,8 @@ except ImportError:
     )
 
 from .agent import fetch_subcontractor_bids, compare_bids
+from .schema import AgentState
 
-
-class AgentState(TypedDict):
-    """Defines the state schema for the Cosuno agent graph."""
-    prompt: str
-    project_id: str | None
-    scope: str | None
-    bids: list
-    comparison: dict
-    recommendation: str
 
 class LangGraphAgent:
     """Constructs a StateGraph-based agent for Cosuno procurement flows.
@@ -43,7 +32,7 @@ class LangGraphAgent:
         self.graph = StateGraph(AgentState)
         self.compiled_graph = None
 
-    def _parse_node(self, state: AgentState) -> Dict[str, Any]:
+    def _parse_node(self, state: AgentState) -> AgentState:
         """Parse node: extract project_id and scope from prompt."""
         import re
 
@@ -58,20 +47,20 @@ class LangGraphAgent:
             scope = m2.group(1).strip()
         return {"project_id": project_id, "scope": scope}
 
-    def _fetch_node(self, state: AgentState) -> Dict[str, Any]:
+    def _fetch_node(self, state: AgentState) -> AgentState:
         """Tool node: call fetch_subcontractor_bids with project context."""
         prompt = state.get("prompt", "")
         project_id = state.get("project_id")
         bids_result = fetch_subcontractor_bids(prompt, project_id=project_id, api_key=self.api_key)
         return {"bids": bids_result.get("bids", [])}
 
-    def _compare_node(self, state: AgentState) -> Dict[str, Any]:
+    def _compare_node(self, state: AgentState) -> AgentState:
         """Analysis node: compare bids and select top candidates."""
         bids = state.get("bids", [])
         compare_result = compare_bids(bids, top_n=self.top_n)
         return {"comparison": compare_result}
 
-    def _format_node(self, state: AgentState) -> Dict[str, Any]:
+    def _format_node(self, state: AgentState) -> AgentState:
         """Output node: format recommendation text."""
         comparison = state.get("comparison", {})
         top = comparison.get("top", [])
@@ -103,7 +92,7 @@ class LangGraphAgent:
         # Compile for execution
         self.compiled_graph = self.graph.compile()
 
-    def run(self, prompt: str) -> Dict[str, Any]:
+    def run(self, prompt: str) -> AgentState:
         """Execute the agent: invoke the compiled graph with initial state."""
         if self.compiled_graph is None:
             self.build_graph()
@@ -119,8 +108,10 @@ class LangGraphAgent:
         final_state = self.compiled_graph.invoke(initial_state)
 
         return {
-            "prompt": prompt,
+            "prompt": final_state.get("prompt", prompt),
             "project_id": final_state.get("project_id"),
+            "scope": final_state.get("scope"),
+            "bids": final_state.get("bids", []),
+            "comparison": final_state.get("comparison", {}),
             "recommendation": final_state.get("recommendation"),
-            "top_bids": final_state.get("comparison", {}).get("top", []),
         }
