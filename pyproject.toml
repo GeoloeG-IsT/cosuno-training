@@ -1,0 +1,18 @@
+[project]
+name = "construction-assistant"
+version = "0.1.0"
+description = "Toy construction project assistant (LangGraph-style) for interview practice"
+authors = [{name = "You", email = "you@example.com"}]
+requires-python = ">=3.11"
+dependencies = ["langgraph>=0.2.0", "pytest>=7.0"]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["src/construction_assistant/tests"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
