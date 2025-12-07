@@ -9,4 +9,7 @@ class AgentState(TypedDict):
     bids: list
     comparison: dict
     recommendation: str
+    # Tool usage fields
+    tool_calls: list[dict] | None
+    tool_results: dict | None
 
