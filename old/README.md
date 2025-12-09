@@ -9,6 +9,14 @@ This repository contains a complete scaffold for a 90-minute live-coding intervi
 - **Comprehensive docs** — LangGraph patterns, uv workflow, and Cosuno use-case walkthrough
 - **Modern `pyproject.toml`** — PEP 518 format with uv/pytest config built-in
 
+**Requirement**
+
+```bash
+# Create the venv
+python -m venv .venv
+
+```
+
 **Quick start**
 ```bash
 # Install with uv
