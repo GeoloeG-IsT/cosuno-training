@@ -13,8 +13,8 @@ This repository contains a complete scaffold for a 90-minute live-coding intervi
 
 ```bash
 # Create the venv
-python -m venv .venv
-
+    python -m venv .venv
+source .venv/bin/activate
 ```
 
 **Quick start**

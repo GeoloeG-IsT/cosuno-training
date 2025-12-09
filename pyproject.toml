@@ -7,18 +7,21 @@ requires-python = ">=3.11"
 dependencies = [
     "langgraph>=0.2.0",
     "pytest>=7.0",
-    "langchain-google-genai>=0.0.1",
+    "langchain>=1.1.2",
+    "langchain-openai>=1.1.0",
+    "langchain-google-genai>=3.2.0",
     "langchain-mistralai>=1.1.0",
-    "python-dotenv>=1.0.0",
+    "python-dotenv>=1.2.0",
 ]
 
 [project.optional-dependencies]
-dev = ["pytest>=7.0"]
+dev = [
+    "pytest>=9.0.2", 
+    "black>=25.11.0", 
+    "isort>=7.0.0", 
+    "mypy>=1.19.0"
+]
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
-testpaths = ["src/construction_assistant/tests"]
-
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+testpaths = ["src/tests"]
